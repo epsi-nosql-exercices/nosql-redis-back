@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import app.bean.Message;
 import app.bean.Utilisateur;
 import app.gestion.GestionnaireUtilisateur;
+import javax.ws.rs.DELETE;
 
 /**
  * Point d'entrée (et déclaration) des services REST pour les utilisateurs,
@@ -126,6 +127,21 @@ public class Adaptateur {
 		Utilisateur utilisateurFollowing = gestionnaireUtilisateur.findById(uuidFollowing);
 		utilisateurFollower.getListeFollowing().add(utilisateurFollowing.getUuid());
 		utilisateurFollowing.getListeFollower().add(utilisateurFollower.getUuid());
+
+		gestionnaireUtilisateur.update(utilisateurFollower, utilisateurFollower.getPseudo());
+		gestionnaireUtilisateur.update(utilisateurFollowing, utilisateurFollowing.getPseudo());
+		return Response.ok().build();
+	}
+        
+        /* Follower subscribe au following */
+	@DELETE
+	@Path("follow")
+	public Response suppFollow(@FormParam("uuidFollower") String uuidFollower,
+			@FormParam("uuidFollowing") String uuidFollowing) {
+		Utilisateur utilisateurFollower = gestionnaireUtilisateur.findById(uuidFollower);
+		Utilisateur utilisateurFollowing = gestionnaireUtilisateur.findById(uuidFollowing);
+		utilisateurFollower.getListeFollowing().removeIf(s -> s.equals(utilisateurFollowing.getUuid()));
+		utilisateurFollowing.getListeFollower().removeIf(s -> s.equals(utilisateurFollower.getUuid()));
 
 		gestionnaireUtilisateur.update(utilisateurFollower, utilisateurFollower.getPseudo());
 		gestionnaireUtilisateur.update(utilisateurFollowing, utilisateurFollowing.getPseudo());
