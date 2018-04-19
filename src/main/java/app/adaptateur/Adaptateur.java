@@ -117,6 +117,31 @@ public class Adaptateur {
 		gestionnaireUtilisateur.update(utilisateur, utilisateur.getPseudo());
 		return Response.ok(utilisateur).build();
 	}
+        
+        /* Liste des messages des abonnements d'un utilisateur */
+        @GET
+	@Path("message")
+	public List<Message> getMessageFull(@QueryParam("uuid") String uuid) {
+		List<Message> listeMessage = new ArrayList<>();
+		Utilisateur uti = gestionnaireUtilisateur.findById(uuid);
+		listeMessage.addAll(uti.getListeMessage());
+                System.out.println("liste following");
+                System.out.println(uti.getListeFollowing());
+		for(String uuidUti : uti.getListeFollowing()){
+			Utilisateur uti2 = gestionnaireUtilisateur.findById(uuidUti);
+                        System.out.println("uti2.getListeMessage()");
+                        System.out.println(uti2.getListeMessage());
+			listeMessage.addAll(uti2.getListeMessage());
+		}
+
+		Collections.sort(listeMessage, new Comparator<Message>() {
+			@Override
+			public int compare(Message m, Message m1) {
+				return m.compare(m1);
+			}
+		});
+		return listeMessage;
+	}
 
 	/* Follower subscribe au following */
 	@PUT
